@@ -95,14 +95,14 @@ This notebook is a **starting point** for deeper studies in:
 ##  Contact
 
 If you'd like to connect or discuss this project, feel free to reach out:
-- Contact me via Email: karimiabolfazl466@gmail.com  
+-  Email: [karimiabolfazl466@gmail.com](karimiabolfazl466@gmail.com)
 - Telegram: [@Abolfazlk83](https://t.me/Abolfazlk83)  
 - LinkedIn: Coming soon  
 - GitHub: [github.com/abolfazlkarimi83](https://github.com/abolfazlkarimi83)
 
 ---
 
-## 🙏 Tanks
+##  Acknowledgments
 
-Thanks for reviewing this project.  
-This notebook was developed by **Abolfazl Karimi** as part of a self-study journey in machine learning and time series forecasting.
+Thanks for taking the time to explore this project.
+ This notebook was developed by **Abolfazl Karimi** as part of an independent learning journey focused on machine learning and ethical AI practices. Special attention was given to real-world implications of predictive models, especially in the criminal justice system.
