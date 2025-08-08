@@ -105,4 +105,5 @@ If you'd like to connect or discuss this project, feel free to reach out:
 ##  Acknowledgments
 
 Thanks for taking the time to explore this project.
- This notebook was developed by **Abolfazl Karimi** as part of an independent learning journey focused on machine learning and ethical AI practices. Special attention was given to real-world implications of predictive models, especially in the criminal justice system.
+
+This notebook was developed by **Abolfazl Karimi** as part of an independent learning journey focused on machine learning and ethical AI practices. Special attention was given to real-world implications of predictive models, especially in the criminal justice system.
